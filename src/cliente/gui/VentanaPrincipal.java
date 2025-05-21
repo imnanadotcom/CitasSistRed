@@ -79,10 +79,5 @@ public class VentanaPrincipal extends JFrame {
         cardLayout.show(panelPrincipal, "mensaje");
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            VentanaPrincipal app = new VentanaPrincipal();
-            app.setVisible(true);
-        });
-    }
+
 }
