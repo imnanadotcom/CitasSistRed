@@ -6,7 +6,7 @@ USE sistema_medico;
 CREATE TABLE Medico (
     id_medico INT AUTO_INCREMENT PRIMARY KEY
     , nombre VARCHAR(100) NOT NULL
-    , especialidad VARCHAR(100) NOT NULL
+    , especialidad VARCHAR(50) NOT NULL
     , cedula VARCHAR(50) NOT NULL
     , correo VARCHAR(100) NOT NULL
 );
