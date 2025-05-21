@@ -3,79 +3,111 @@ package cliente.gui;
 import cliente.validacionEntradas.ValidarMedico;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
 public class VentanaMedicos extends JPanel {
 
-    private JTable tablaPacientes;
+    private JTable tablaMedicos;
     private DefaultTableModel modeloTabla;
+    private JButton btnEditar;
+    private JButton btnEliminar;
 
     public VentanaMedicos() {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Botón Nuevo paciente
-        JButton btnNuevoPaciente = new JButton("Nuevo Médico");
-        btnNuevoPaciente.setBackground(Color.DARK_GRAY);
-        btnNuevoPaciente.setForeground(Color.WHITE);
-        btnNuevoPaciente.setFocusPainted(false);
-        btnNuevoPaciente.setPreferredSize(new Dimension(150, 30));
+        // Botones arriba
+        JButton btnNuevoMedico = new JButton("Nuevo Médico");
+        btnNuevoMedico.setBackground(Color.DARK_GRAY);
+        btnNuevoMedico.setForeground(Color.WHITE);
+        btnNuevoMedico.setFocusPainted(false);
+        btnNuevoMedico.setPreferredSize(new Dimension(150, 30));
 
-        JPanel panelBoton = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panelBoton.setBackground(Color.WHITE);
-        panelBoton.add(btnNuevoPaciente);
+        btnEditar = new JButton("Editar");
+        btnEditar.setEnabled(false);
+        btnEliminar = new JButton("Eliminar");
+        btnEliminar.setEnabled(false);
 
-        add(panelBoton, BorderLayout.NORTH);
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelBotones.setBackground(Color.WHITE);
+        panelBotones.add(btnNuevoMedico);
+        panelBotones.add(btnEditar);
+        panelBotones.add(btnEliminar);
+        add(panelBotones, BorderLayout.NORTH);
 
-        // Etiqueta pacientes registrados
-        JLabel lblPacientesRegistrados = new JLabel("Médicos registrados");
-        lblPacientesRegistrados.setFont(new Font("Arial", Font.BOLD, 12));
-        lblPacientesRegistrados.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        add(lblPacientesRegistrados, BorderLayout.CENTER);
+        // Etiqueta arriba de la tabla
+        JLabel lblMedicosRegistrados = new JLabel("Médicos registrados");
+        lblMedicosRegistrados.setFont(new Font("Arial", Font.BOLD, 12));
+        lblMedicosRegistrados.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
 
-        // Tabla de pacientes
+        // Modelo y tabla
         String[] columnas = {"ID", "Nombre", "Especialidad", "Cédula", "Correo"};
         modeloTabla = new DefaultTableModel(columnas, 0);
-        tablaPacientes = new JTable(modeloTabla);
-        JScrollPane scrollPane = new JScrollPane(tablaPacientes);
-        add(scrollPane, BorderLayout.SOUTH);
+        tablaMedicos = new JTable(modeloTabla);
 
-        // Acción del botón "Nuevo paciente"
-        btnNuevoPaciente.addActionListener((ActionEvent e) -> {
-            // Crear el cuadro de diálogo emergente
-            JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Nuevo Paciente", true);
-            dialog.setSize(300, 250);
+        // Datos de prueba
+        modeloTabla.addRow(new Object[]{"1", "Dr. Juan Pérez", "Cardiología", "CED123456", "juan.perez@example.com"});
+        modeloTabla.addRow(new Object[]{"2", "Dra. Ana Gómez", "Pediatría", "CED654321", "ana.gomez@example.com"});
+
+        JScrollPane scrollPane = new JScrollPane(tablaMedicos);
+
+        JPanel panelCentro = new JPanel(new BorderLayout());
+        panelCentro.setBackground(Color.WHITE);
+        panelCentro.add(lblMedicosRegistrados, BorderLayout.NORTH);
+        panelCentro.add(scrollPane, BorderLayout.CENTER);
+
+        add(panelCentro, BorderLayout.CENTER);
+
+        // Listener para selección en tabla
+        tablaMedicos.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    boolean filaSeleccionada = tablaMedicos.getSelectedRow() != -1;
+                    btnEditar.setEnabled(filaSeleccionada);
+                    btnEliminar.setEnabled(filaSeleccionada);
+                }
+            }
+        });
+
+        // Acción botón Nuevo Médico
+        btnNuevoMedico.addActionListener((ActionEvent e) -> {
+            JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Nuevo Médico", true);
+            dialog.setSize(350, 300);
             dialog.setLocationRelativeTo(this);
 
-            // Panel para los campos del formulario
-            JPanel panelFormulario = new JPanel(new GridLayout(5, 2));
+            JPanel panelFormulario = new JPanel(new GridLayout(5, 2, 5, 5));
             panelFormulario.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-            // Campos de entrada
             JTextField txtNombre = new JTextField();
             JTextField txtEspecialidad = new JTextField();
             JTextField txtCedula = new JTextField();
             JTextField txtCorreo = new JTextField();
 
-            // Etiquetas
             panelFormulario.add(new JLabel("Nombre:"));
             panelFormulario.add(txtNombre);
             panelFormulario.add(new JLabel("Especialidad:"));
             panelFormulario.add(txtEspecialidad);
-            panelFormulario.add(new JLabel("Cedula:"));
+            panelFormulario.add(new JLabel("Cédula:"));
             panelFormulario.add(txtCedula);
             panelFormulario.add(new JLabel("Correo:"));
             panelFormulario.add(txtCorreo);
 
-            // Botones
-            JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            JPanel panelBotonesDialog = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             JButton btnAgregar = new JButton("Agregar");
             JButton btnCancelar = new JButton("Cancelar");
+            panelBotonesDialog.add(btnAgregar);
+            panelBotonesDialog.add(btnCancelar);
 
-            btnAgregar.addActionListener((ActionEvent evt) -> {
+            dialog.add(panelFormulario, BorderLayout.CENTER);
+            dialog.add(panelBotonesDialog, BorderLayout.SOUTH);
+
+            btnAgregar.addActionListener(ev -> {
                 String nombre = txtNombre.getText();
                 String especialidad = txtEspecialidad.getText();
                 String cedula = txtCedula.getText();
@@ -90,7 +122,7 @@ public class VentanaMedicos extends JPanel {
                     return;
                 }
                 if (!ValidarMedico.validarCedula(cedula)) {
-                    JOptionPane.showMessageDialog(dialog, "La cedula debe tener .-....");
+                    JOptionPane.showMessageDialog(dialog, "Cédula inválida.");
                     return;
                 }
                 if (!ValidarMedico.validarCorreo(correo)) {
@@ -98,25 +130,106 @@ public class VentanaMedicos extends JPanel {
                     return;
                 }
 
-                // Aquí puedes agregar la lógica para agregar el paciente a la tabla
-                // Por ahora, solo mostramos un mensaje con los datos ingresados
-                JOptionPane.showMessageDialog(dialog, "Nuevo paciente agregado: " + nombre + ", " + especialidad);
-                dialog.dispose(); // Cerrar la ventana después de agregar
+                // Agregar médico a la tabla
+                int nuevoId = modeloTabla.getRowCount() + 1;
+                modeloTabla.addRow(new Object[]{String.valueOf(nuevoId), nombre, especialidad, cedula, correo});
+
+                JOptionPane.showMessageDialog(dialog, "Médico agregado correctamente.");
+                dialog.dispose();
             });
 
-            // Acción botón "Cancelar"
-            btnCancelar.addActionListener((ActionEvent evt) -> {
-                dialog.dispose(); // Cerrar la ventana sin hacer nada
-            });
-
-            panelBotones.add(btnAgregar);
-            panelBotones.add(btnCancelar);
-
-            // Agregar los paneles al cuadro de diálogo
-            dialog.add(panelFormulario, BorderLayout.CENTER);
-            dialog.add(panelBotones, BorderLayout.SOUTH);
+            btnCancelar.addActionListener(ev -> dialog.dispose());
 
             dialog.setVisible(true);
+        });
+
+        // Acción botón Editar
+        btnEditar.addActionListener(ev -> {
+            int fila = tablaMedicos.getSelectedRow();
+            if (fila == -1) {
+                JOptionPane.showMessageDialog(this, "Selecciona un médico para editar.");
+                return;
+            }
+
+            JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Editar Médico", true);
+            dialog.setSize(350, 300);
+            dialog.setLocationRelativeTo(this);
+
+            JPanel panelFormulario = new JPanel(new GridLayout(5, 2, 5, 5));
+            panelFormulario.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+            JTextField txtNombre = new JTextField((String) modeloTabla.getValueAt(fila, 1));
+            JTextField txtEspecialidad = new JTextField((String) modeloTabla.getValueAt(fila, 2));
+            JTextField txtCedula = new JTextField((String) modeloTabla.getValueAt(fila, 3));
+            JTextField txtCorreo = new JTextField((String) modeloTabla.getValueAt(fila, 4));
+
+            panelFormulario.add(new JLabel("Nombre:"));
+            panelFormulario.add(txtNombre);
+            panelFormulario.add(new JLabel("Especialidad:"));
+            panelFormulario.add(txtEspecialidad);
+            panelFormulario.add(new JLabel("Cédula:"));
+            panelFormulario.add(txtCedula);
+            panelFormulario.add(new JLabel("Correo:"));
+            panelFormulario.add(txtCorreo);
+
+            JPanel panelBotonesDialog = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            JButton btnGuardar = new JButton("Guardar");
+            JButton btnCancelarEditar = new JButton("Cancelar");
+            panelBotonesDialog.add(btnGuardar);
+            panelBotonesDialog.add(btnCancelarEditar);
+
+            dialog.add(panelFormulario, BorderLayout.CENTER);
+            dialog.add(panelBotonesDialog, BorderLayout.SOUTH);
+
+            btnGuardar.addActionListener(ev2 -> {
+                String nombre = txtNombre.getText();
+                String especialidad = txtEspecialidad.getText();
+                String cedula = txtCedula.getText();
+                String correo = txtCorreo.getText();
+
+                if (!ValidarMedico.validarNombre(nombre)) {
+                    JOptionPane.showMessageDialog(dialog, "Nombre inválido o demasiado largo.");
+                    return;
+                }
+                if (!ValidarMedico.validarEspecialidad(especialidad)) {
+                    JOptionPane.showMessageDialog(dialog, "La especialidad debe tener menos de 100 caracteres.");
+                    return;
+                }
+                if (!ValidarMedico.validarCedula(cedula)) {
+                    JOptionPane.showMessageDialog(dialog, "Cédula inválida.");
+                    return;
+                }
+                if (!ValidarMedico.validarCorreo(correo)) {
+                    JOptionPane.showMessageDialog(dialog, "Correo inválido.");
+                    return;
+                }
+
+                modeloTabla.setValueAt(nombre, fila, 1);
+                modeloTabla.setValueAt(especialidad, fila, 2);
+                modeloTabla.setValueAt(cedula, fila, 3);
+                modeloTabla.setValueAt(correo, fila, 4);
+
+                JOptionPane.showMessageDialog(dialog, "Médico actualizado correctamente.");
+                dialog.dispose();
+            });
+
+            btnCancelarEditar.addActionListener(ev2 -> dialog.dispose());
+
+            dialog.setVisible(true);
+        });
+
+        // Acción botón Eliminar
+        btnEliminar.addActionListener(ev -> {
+            int fila = tablaMedicos.getSelectedRow();
+            if (fila == -1) {
+                JOptionPane.showMessageDialog(this, "Selecciona un médico para eliminar.");
+                return;
+            }
+
+            int confirm = JOptionPane.showConfirmDialog(this, "¿Seguro que quieres eliminar este médico?", "Confirmar", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                modeloTabla.removeRow(fila);
+            }
         });
     }
 }
