@@ -1,8 +1,12 @@
-package common;
+package cliente.interfaz;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
+
+import common.CitaDTO;
+import common.MedicoDTO;
+import common.PacienteDTO;
 
 public interface ServicioCitasRMI extends Remote {
 

@@ -6,6 +6,9 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+
+import Servidor.interfaz.ServicioCitasRMI;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.text.SimpleDateFormat;
@@ -18,8 +21,12 @@ public class VentanaCitas extends JPanel {
     private DefaultTableModel modeloTabla;
     private JButton btnEditar;
     private JButton btnEliminar;
+    private ServicioCitasRMI service;
 
-    public VentanaCitas() {
+    public VentanaCitas(ServicioCitasRMI service) {
+        
+        this.service = service;
+
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));

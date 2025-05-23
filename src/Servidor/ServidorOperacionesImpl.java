@@ -3,8 +3,8 @@ package Servidor;
 import common.CitaDTO;
 import common.MedicoDTO;
 import common.PacienteDTO;
-import common.ServicioCitasRMI;
-import Servidor.baseDatos.ConexionBD; //
+import Servidor.baseDatos.ConexionBD;
+import Servidor.interfaz.ServicioCitasRMI;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;

@@ -9,9 +9,9 @@ public class ConexionBD {
     private Connection conexion;
 
     public ConexionBD() throws SQLException {
-        String url = "jdbc:mysql://127.0.0.1:3306/sistema_medico";
+        String url = "jdbc:mysql://127.0.0.1:8889/sistema_medico";
         String usuario = "root";
-        String password = "";
+        String password = "root";
 
         conexion = DriverManager.getConnection(url, usuario, password);
         System.out.println("Conexión a la base de datos establecida.");

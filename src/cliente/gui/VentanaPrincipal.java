@@ -1,6 +1,9 @@
 package cliente.gui;
 
 import javax.swing.*;
+
+import Servidor.interfaz.ServicioCitasRMI;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
@@ -8,15 +11,19 @@ public class VentanaPrincipal extends JFrame {
 
     private JPanel panelPrincipal;
     private CardLayout cardLayout;
+    private ServicioCitasRMI service;
 
-    public VentanaPrincipal() {
+    public VentanaPrincipal(ServicioCitasRMI service) {
+
+        this.service = service;
+
         setTitle("Sistema de citas");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(700, 400);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // Panel lateral
+        
         JPanel panelLateral = new JPanel();
         panelLateral.setBackground(Color.LIGHT_GRAY);
         panelLateral.setPreferredSize(new Dimension(150, 0));
@@ -46,23 +53,20 @@ public class VentanaPrincipal extends JFrame {
 
         add(panelLateral, BorderLayout.WEST);
 
-        // Panel principal con CardLayout para cambiar contenido
         cardLayout = new CardLayout();
         panelPrincipal = new JPanel(cardLayout);
 
-        // Panel con mensaje inicial
         JPanel panelMensaje = new JPanel(new BorderLayout());
         JLabel lblMensaje = new JLabel("Selecciona una sección");
         lblMensaje.setFont(new Font("Arial", Font.ITALIC, 16));
         lblMensaje.setHorizontalAlignment(SwingConstants.CENTER);
         panelMensaje.add(lblMensaje, BorderLayout.CENTER);
 
-        // Crear paneles para las secciones
-        JPanel panelPacientes = new VentanaPacientes();
-        JPanel panelMedicos = new VentanaMedicos();
-        JPanel panelCitas = new VentanaCitas();
+        JPanel panelPacientes = new VentanaPacientes(this.service);
+        JPanel panelMedicos = new VentanaMedicos(this.service);
+        JPanel panelCitas = new VentanaCitas(this.service);
 
-        // Agregar paneles al cardLayout con nombres clave
+
         panelPrincipal.add(panelMensaje, "mensaje");
         panelPrincipal.add(panelPacientes, "pacientes");
         panelPrincipal.add(panelMedicos, "medicos");
@@ -70,12 +74,11 @@ public class VentanaPrincipal extends JFrame {
 
         add(panelPrincipal, BorderLayout.CENTER);
 
-        // Listeners para cambiar panel
         btnPacientes.addActionListener((ActionEvent e) -> cardLayout.show(panelPrincipal, "pacientes"));
         btnMedicos.addActionListener((ActionEvent e) -> cardLayout.show(panelPrincipal, "medicos"));
         btnCitas.addActionListener((ActionEvent e) -> cardLayout.show(panelPrincipal, "citas"));
 
-        // Mostrar mensaje inicial
+        
         cardLayout.show(panelPrincipal, "mensaje");
     }
 

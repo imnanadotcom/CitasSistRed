@@ -1,4 +1,4 @@
-DROP DATABASE IF EXISTS sistema_citas;
+DROP DATABASE IF EXISTS sistema_medico;
 CREATE DATABASE sistema_medico;
 USE sistema_medico;
 

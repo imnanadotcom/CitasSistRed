@@ -6,6 +6,9 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+
+import Servidor.interfaz.ServicioCitasRMI;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
@@ -15,8 +18,12 @@ public class VentanaPacientes extends JPanel {
     private DefaultTableModel modeloTabla;
     private JButton btnEditar;
     private JButton btnEliminar;
+    private ServicioCitasRMI service;
 
-    public VentanaPacientes() {
+    public VentanaPacientes(ServicioCitasRMI service) {
+
+        this.service = service;
+
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
