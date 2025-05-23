@@ -2,7 +2,7 @@ package cliente;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import Servidor.interfaz.ServicioCitasRMI;
+import common.interfaz.ServicioCitasRMI;
 import cliente.gui.VentanaPrincipal;
 
 public class ClienteMain {

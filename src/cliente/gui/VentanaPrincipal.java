@@ -2,7 +2,7 @@ package cliente.gui;
 
 import javax.swing.*;
 
-import Servidor.interfaz.ServicioCitasRMI;
+import common.interfaz.ServicioCitasRMI;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;

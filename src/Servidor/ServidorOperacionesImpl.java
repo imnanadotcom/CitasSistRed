@@ -4,7 +4,7 @@ import common.CitaDTO;
 import common.MedicoDTO;
 import common.PacienteDTO;
 import Servidor.baseDatos.ConexionBD;
-import Servidor.interfaz.ServicioCitasRMI;
+import common.interfaz.ServicioCitasRMI;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;

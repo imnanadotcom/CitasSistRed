@@ -1,4 +1,4 @@
-package cliente.interfaz;
+package common.interfaz;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
