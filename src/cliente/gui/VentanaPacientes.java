@@ -5,8 +5,6 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-import common.CitaDTO;
-import common.MedicoDTO;
 import common.PacienteDTO;
 import common.interfaz.ServicioCitasRMI;
 import java.awt.*;

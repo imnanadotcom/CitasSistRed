@@ -1,16 +1,16 @@
 package cliente.gui;
 
 import cliente.validacionEntradas.ValidarMedico;
-
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-
+import common.MedicoDTO;
 import common.interfaz.ServicioCitasRMI;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.rmi.RemoteException;
+import java.util.List;
 
 public class VentanaMedicos extends JPanel {
 
@@ -28,7 +28,6 @@ public class VentanaMedicos extends JPanel {
         setBackground(Color.WHITE);
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Botones arriba
         JButton btnNuevoMedico = new JButton("Nuevo Médico");
         btnNuevoMedico.setBackground(Color.DARK_GRAY);
         btnNuevoMedico.setForeground(Color.WHITE);
@@ -47,19 +46,18 @@ public class VentanaMedicos extends JPanel {
         panelBotones.add(btnEliminar);
         add(panelBotones, BorderLayout.NORTH);
 
-        // Etiqueta arriba de la tabla
         JLabel lblMedicosRegistrados = new JLabel("Médicos registrados");
         lblMedicosRegistrados.setFont(new Font("Arial", Font.BOLD, 12));
         lblMedicosRegistrados.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
 
-        // Modelo y tabla
         String[] columnas = {"ID", "Nombre", "Especialidad", "Cédula", "Correo"};
-        modeloTabla = new DefaultTableModel(columnas, 0);
+        modeloTabla = new DefaultTableModel(columnas, 0) {
+             @Override
+            public boolean isCellEditable(int row, int column) {
+                return column != 0;
+            }
+        };
         tablaMedicos = new JTable(modeloTabla);
-
-        // Datos de prueba
-        modeloTabla.addRow(new Object[]{"1", "Dr. Juan Pérez", "Cardiología", "CED123456", "juan.perez@example.com"});
-        modeloTabla.addRow(new Object[]{"2", "Dra. Ana Gómez", "Pediatría", "CED654321", "ana.gomez@example.com"});
 
         JScrollPane scrollPane = new JScrollPane(tablaMedicos);
 
@@ -70,7 +68,6 @@ public class VentanaMedicos extends JPanel {
 
         add(panelCentro, BorderLayout.CENTER);
 
-        // Listener para selección en tabla
         tablaMedicos.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -82,7 +79,8 @@ public class VentanaMedicos extends JPanel {
             }
         });
 
-        // Acción botón Nuevo Médico
+        cargarMedicos();
+
         btnNuevoMedico.addActionListener((ActionEvent e) -> {
             JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Nuevo Médico", true);
             dialog.setSize(350, 300);
@@ -137,12 +135,19 @@ public class VentanaMedicos extends JPanel {
                     return;
                 }
 
-                // Agregar médico a la tabla
-                int nuevoId = modeloTabla.getRowCount() + 1;
-                modeloTabla.addRow(new Object[]{String.valueOf(nuevoId), nombre, especialidad, cedula, correo});
-
-                JOptionPane.showMessageDialog(dialog, "Médico agregado correctamente.");
-                dialog.dispose();
+                try {
+                    MedicoDTO nuevoMedico = new MedicoDTO(0, nombre, especialidad, cedula, correo);
+                    service.agregarMedico(nuevoMedico);
+                    JOptionPane.showMessageDialog(dialog, "Médico agregado correctamente.");
+                    dialog.dispose();
+                    cargarMedicos();
+                } catch (RemoteException ex) {
+                    JOptionPane.showMessageDialog(dialog, "Error RMI al agregar médico: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(dialog, "Error inesperado al agregar médico: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
+                }
             });
 
             btnCancelar.addActionListener(ev -> dialog.dispose());
@@ -150,13 +155,14 @@ public class VentanaMedicos extends JPanel {
             dialog.setVisible(true);
         });
 
-        // Acción botón Editar
         btnEditar.addActionListener(ev -> {
             int fila = tablaMedicos.getSelectedRow();
             if (fila == -1) {
                 JOptionPane.showMessageDialog(this, "Selecciona un médico para editar.");
                 return;
             }
+
+            int idMedico = Integer.parseInt(modeloTabla.getValueAt(fila, 0).toString());
 
             JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Editar Médico", true);
             dialog.setSize(350, 300);
@@ -211,13 +217,19 @@ public class VentanaMedicos extends JPanel {
                     return;
                 }
 
-                modeloTabla.setValueAt(nombre, fila, 1);
-                modeloTabla.setValueAt(especialidad, fila, 2);
-                modeloTabla.setValueAt(cedula, fila, 3);
-                modeloTabla.setValueAt(correo, fila, 4);
-
-                JOptionPane.showMessageDialog(dialog, "Médico actualizado correctamente.");
-                dialog.dispose();
+                try {
+                    MedicoDTO medicoActualizado = new MedicoDTO(idMedico, nombre, especialidad, cedula, correo);
+                    service.actualizarMedico(medicoActualizado);
+                    JOptionPane.showMessageDialog(dialog, "Médico actualizado correctamente.");
+                    dialog.dispose();
+                    cargarMedicos();
+                } catch (RemoteException ex) {
+                    JOptionPane.showMessageDialog(dialog, "Error RMI al actualizar médico: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(dialog, "Error inesperado al actualizar médico: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
+                }
             });
 
             btnCancelarEditar.addActionListener(ev2 -> dialog.dispose());
@@ -225,7 +237,6 @@ public class VentanaMedicos extends JPanel {
             dialog.setVisible(true);
         });
 
-        // Acción botón Eliminar
         btnEliminar.addActionListener(ev -> {
             int fila = tablaMedicos.getSelectedRow();
             if (fila == -1) {
@@ -233,10 +244,46 @@ public class VentanaMedicos extends JPanel {
                 return;
             }
 
+            int idMedico = Integer.parseInt(modeloTabla.getValueAt(fila, 0).toString());
+
             int confirm = JOptionPane.showConfirmDialog(this, "¿Seguro que quieres eliminar este médico?", "Confirmar", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                modeloTabla.removeRow(fila);
+                try {
+                    service.eliminarMedico(idMedico);
+                    JOptionPane.showMessageDialog(this, "Médico eliminado correctamente.");
+                    cargarMedicos();
+                } catch (RemoteException ex) {
+                    JOptionPane.showMessageDialog(this, "Error RMI al eliminar médico: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Error inesperado al eliminar médico: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
+                }
             }
         });
+    }
+
+    private void cargarMedicos() {
+        modeloTabla.setRowCount(0);
+        try {
+            List<MedicoDTO> medicos = service.obtenerMedicos();
+            if (medicos != null) {
+                for (MedicoDTO medico : medicos) {
+                    modeloTabla.addRow(new Object[]{
+                        medico.getIdMedico(),
+                        medico.getNombre(),
+                        medico.getEspecialidad(),
+                        medico.getCedula(),
+                        medico.getCorreo()
+                    });
+                }
+            }
+        } catch (RemoteException e) {
+            JOptionPane.showMessageDialog(this, "Error RMI al cargar médicos: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error inesperado al cargar médicos: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
     }
 }
